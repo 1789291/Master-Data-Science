@@ -1,0 +1,343 @@
+   458	whoami
+   459	echo Welcome to master
+   460	echo whoami
+   461	cat /etc/os-release
+   462	cat -n /etc/os-release
+   463	jlkjlkj
+   464	cat 
+   465	cat /home/dsc/Data/shell/Text_example.txt
+   466	cat Data/shell/Text_example.txt
+   467	cd Data
+   468	cat Data/shell/Text_example.txt
+   469	cat ~/Data/shell/Text_example.txt
+   470	cd ..
+   471	echo $PATH
+   472	echo "PATH"
+   473	echo 'PATH'
+   474	echo '$PATH'
+   475	echo "$PATH"
+   476	echo `$PATH`
+   477	echo `date`
+   478	date
+   479	echo "date"
+   480	echo "$date"
+   481	echo '$date'
+   482	echo `date`
+   483	echo "$(date)"
+   484	VARIABLE=`date`
+   485	echo $VARIABLE
+   486	echo "World\
+   487	is mine \
+   488	\
+   489	\
+   490	\
+   491	\
+   492	"
+   493	echo "World\
+   494	is mine \
+   495	\
+   496	\
+   497	\
+   498	\
+   499	\
+   500	\
+   501	\
+   502	\
+   503	
+   504	echo "World" \\
+   505	"is mine"
+   506	echo $PWD
+   507	pwd
+   508	cd Data/opentraveldata
+   509	cd -
+   510	cd ~
+   511	cd -
+   512	cd 
+   513	ls 
+   514	ls -1
+   515	ls -s
+   516	ls -s -1
+   517	ls -s1
+   518	ls -1s
+   519	ls
+   520	ls -l
+   521	cd Desktop
+   522	ll
+   523	cd ..
+   524	ll
+   525	ls -l 
+   526	ll
+   527	ls -a
+   528	cd .zsh_cache
+   529	ll
+   530	cd -
+   531	ls -a
+   532	ls -l .zsh_history
+   533	ls -s .zsh_history
+   534	ls -S
+   535	ls -lS
+   536	ls -lSr
+   537	ls -lt
+   538	ls -l
+   539	ls -l empty_file
+   540	chmod u-r empty_file
+   541	ls -l empty_file
+   542	touch empty_file
+   543	ls -l empty_file
+   544	touch empty_file2
+   545	ls -l empty_file2
+   546	chmod u+r,g-xw empty_file
+   547	chmod u+r, g-xw empty_file
+   548	ls -l empty_file
+   549	chmod 777 empty_file
+   550	ls -l empty_file
+   551	chmod 747 empty_file
+   552	ls -l empty_file
+   553	chmod 757 empty_file
+   554	ls -l empty_file
+   555	mkdir test
+   556	ll
+   557	cd test
+   558	mkdir one two 3
+   559	ll
+   560	mkdir four/five/six
+   561	mkdir -p four/five/six
+   562	cd four/five/six
+   563	pwd
+   564	cd 
+   565	cp empty_file empty_copy
+   566	ls -l empty_copy
+   567	cp empty_file test
+   568	ls test
+   569	cp empty_file test/empty_copy
+   570	ls test
+   571	ls -l empty_*
+   572	cp -p empty_file empty_copy_good
+   573	ls -l empty_*
+   574	ls
+   575	mkdir test2
+   576	cp test2 test3
+   577	cp -rp test2 test3
+   578	ls test3
+   579	cp -rp test test4
+   580	ls test4
+   581	mv test4 test5
+   582	ls -l empty_*
+   583	mv empty_copy new_copy
+   584	ls -l new_copy
+   585	ll
+   586	rm test
+   587	rm -r test
+   588	rm -r test2 test3 test5 
+   589	git init test_git_error
+   590	cd test_git_error
+   591	cd ..
+   592	git init
+   593	cd Repos
+   594	cd csvkit
+   595	cd 
+   596	ls -l .git
+   597	rm -rf .git
+   598	mkdir first_dir
+   599	rm -rf first_dir
+   600	mkdir first_dir
+   601	cd first_dir
+   602	touch text_file.txt
+   603	ll
+   604	chmod 656 text_file.txt
+   605	ll
+   606	mkdr sub1 sub2 text_file
+   607	mkdir sub1 sub2 text_file
+   608	ll
+   609	cp text_file sub1
+   610	cp text_file.txt sub1
+   611	mv text_file.txt sub2/text_file.txt.2
+   612	ll
+   613	cp -r sub1 sub3
+   614	ll
+   615	cd sub2
+   616	mv text_file.txt.2 text_file.txt.backup
+   617	ll
+   618	mv text_file.txt.backup ../.text_file.txt.backup
+   619	cd ..
+   620	rm -rf sub2
+   621	ll
+   622	ll -a
+   623	cd ..
+   624	ll
+   625	sh -c "ls"
+   626	sh "ls"
+   627	man mkdir
+   628	less Data/shell/Finn.txt
+   629	less -N Data/shell/Finn.txt
+   630	less -S Data/shell/Finn.txt
+   631	less -N Data/shell/Finn.txt
+   632	tree
+   633	man tree
+   634	less Data/opentraveldata/optd_aircraft.csv
+   635	type man
+   636	type cd
+   637	type ls
+   638	gedit .zshrc
+   639	less .zshrc
+   640	which python
+   641	type python
+   642	whereis python
+   643	sudo which python
+   644	alias
+   645	alias gs="git status"
+   646	gs
+   647	iuyiuyiuy
+   648	jkdfhgkjhfdg
+   649	this is wowwww 
+   650	cat /home/dsc/Data/shell/Text_example.txt
+   651	history
+   652	history -5
+   653	ls -l .history
+   654	less .history
+   655	echo "Hello"
+   656	echo "hello"> hello_world.txt
+   657	cat hello_world.txt
+   658	echo "hello again"> hello_world.txt
+   659	cat hello_world.txt
+   660	echo "hello again">> hello_world.txt
+   661	cat hello_world.txt
+   662	echo "hello again"> hello_world.txt
+   663	cat hello_world.txt
+   664	wc hello_world.txt
+   665	echo "hello again" 
+   666	echo "hello again" | wc
+   667	cat hello_world.txt
+   668	cat hello_world.txt | wc
+   669	cd Data/shell
+   670	head Finn.txt
+   671	cat Finn.txt | head
+   672	cat -n Finn.txt | head
+   673	cat -n Text_example.txt | head 5
+   674	cat -n Text_example.txt | head -5
+   675	cat -n Text_example.txt | head -n 5
+   676	cat -n Text_example.txt | head -n -5
+   677	cat -n Text_example.txt 
+   678	cat -n Text_example.txt | head -n -5
+   679	cat -n Text_example.txt | tail -n 5
+   680	cat -n Text_example.txt | tail -5
+   681	cat -n Text_example.txt | tail -n -5
+   682	cat -n Text_example.txt | tail -n +5
+   683	cat -n Text_example.txt 
+   684	cat -n Text_example.txt | tail -n +5
+   685	cat -n Text_example.txt | tail -n +4
+   686	cat -n Text_example.txt | tail -n +6
+   687	cd ..
+   688	cd us_dot
+   689	ll
+   690	ls -S
+   691	ll -S
+   692	cd otp
+   693	ls -S
+   694	ls -sS
+   695	ls -lS
+   696	ls -Ss
+   697	ls -Ss | head -3
+   698	ls -S | head -3
+   699	ls -lS | head -4 | tail -3
+   700	ls -l
+   701	ls -s
+   702	ls -sS
+   703	ls -S
+   704	ls -S | head -3 
+   705	ls -lS | head -3 
+   706	ls -lS | head -4 
+   707	ls -lS | head -4 | tail -3
+   708	ls -lS | head -4 | tail -3 >three_largest_files.txt
+   709	history 20 
+   710	history 20 >last_20.txt
+   711	tail -20 ~/.history 
+   712	cd ..
+   713	cd ../shell
+   714	head -n 3 Text_example.txt
+   715	cat -n Text_example.txt| head -3
+   716	cat -n Text_example.txt| head -n -3
+   717	cat -n Text_example.txt| head -n -3 | tail -n +2
+   718	cat -n Text_example.txt| head -n -3 | tail -n +3
+   719	wc ../opentraveldata/optd_aircraft.csv
+   720	wc -n ../opentraveldata/optd_aircraft.csv
+   721	wc -l ../opentraveldata/optd_aircraft.csv
+   722	head -n -5 Finn.txt
+   723	head -5 Finn.txt
+   724	head -5 Finn.txt | wc -w 
+   725	head -5 Finn.txt
+   726	head -5 Finn.txt | wc -w 
+   727	head -5 Finn.txt
+   728	find empty*
+   729	cd
+   730	find . -name "text_file*"
+   731	find -name "text_file*"
+   732	find first_dir -name "text_file*"
+   733	find -name "text_file*" first_dir
+   734	find -name "text_file*"
+   735	find first_dir -name "text_file*"
+   736	find first_dir -type d -name "text_file*"
+   737	find first_dir -type f -name "text_file*"
+   738	find first_dir -type f -name "teXt_file*"
+   739	find first_dir -type f -iname "teXt_file*"
+   740	find -type f -iname "teXt_file*"
+   741	find -type f -iname "teXt_file*" -maxdepth 5
+   742	find -maxdepth 5  -type f -iname "teXt_file*"
+   743	find -type f -iname "teXt_file*"
+   744	find -maxdepth 5 -mindepth 2 -type f -iname "teXt_file*"
+   745	find -maxdepth 5 -mindepth 3 -type f -iname "teXt_file*"
+   746	find -maxdepth 5 -mindepth 4 -type f -iname "teXt_file*"
+   747	find -type f -iname "teXt_file*" -perm 777 
+   748	find -type f -iname "teXt_file*" ! -perm 777 
+   749	find -type f ! -iname "teXt_file*" -perm 777 
+   750	find -empty
+   751	find -empty | wc
+   752	find -empty
+   753	find -maxdepth 2  -not -empty | wc
+   754	find Data -size +10M
+   755	find Data -size -1k
+   756	find -maxdepth 2 -size -1k
+   757	find . mmin -60
+   758	find . -mmin -60
+   759	find . -mtime -61
+   760	find . -mtime -1
+   761	find -maxdepth 5 -type f -iname "teXt_file*"
+   762	find -maxdepth 5 -type f -iname "teXt_file*" -exec ls -l {} \;
+   763	echo this is ; echo second part
+   764	echo this is \; echo second part
+   765	ls -l
+   766	find -maxdepth 5 -type f -iname "teXt_file*" -exec ls -l \;
+   767	find -maxdepth 5 -type f -iname "teXt_file*" -exec echo "YESSS" \;
+   768	find -maxdepth 5 -type f -iname "teXt_file*" -exec echo "YESSS" \; -exec "ls -s {}" \;
+   769	find -maxdepth 5 -type f -iname "teXt_file*" -exec sh -c "ls -l {} | wc" \;
+   770	find -maxdepth 5 -type f -iname "teXt_file*" -exec sh -c "ls -l {}" \;
+   771	sh -c echo this
+   772	sh -c echo "this"
+   773	sh -c "echo this"
+   774	sh  "echo this"
+   775	sh -c  "echo this | wc"
+   776	find -maxdepth 5 -type f -iname "teXt_file*" -exec sh -c "ls -l {} | wc" \;
+   777	find -maxdepth 5 -type f -iname "teXt_file*" -exec sh -c "ls -l {}" \; | wc
+   778	find -maxdepth 5 -type f -iname "teXt_file*" -ok sh -c "ls -l {} | wc" \;
+   779	find -mindepth 2 -type f -mmin -60
+   780	find -type f -size 0k ! -perm 777
+   781	find -type f -empty ! -perm 777
+   782	find -type f -empty ! -perm 777 -ok chmod 777 {} \;
+   783	find Data -maxdepth 1 -type f -exec sh -c "ls -s {}|head 3" \; 
+   784	find Data -maxdepth 1 -type f -exec sh -c "ls -s {}|head -3" \; 
+   785	find Data -maxdepth 1 -type f -exec sh -c "ls -s {}" \; 
+   786	find Data -maxdepth 1 -type f -exec "ls -s {}" \; 
+   787	find Data -maxdepth 1 -type f  
+   788	ls Data
+   789	find Data -maxdepth 1 
+   790	find Data -maxdepth 1 -type d
+   791	find Data -maxdepth 1 - mindepth 1 -type d 
+   792	find Data -maxdepth 1 -mindepth 1 -type d 
+   793	find Data -maxdepth 1 -mindepth 1 -type d -exec sh -c "ls -S {} | head -3" 
+   794	find Data -maxdepth 1 -mindepth 1 -type d -exec sh -c "ls -S {} | head -3" \; 
+   795	find Data -maxdepth 1 -mindepth 1 -type d -exec "echo {}" \; -exec sh -c "ls -S {} | head -3" \; 
+   796	find Data -maxdepth 1 -mindepth 1 -type d -exec echo {} \; -exec sh -c "ls -S {} | head -3" \; 
+   797	find Data -maxdepth 1 -mindepth 1 -type d -exec echo "\n{}" \; -exec sh -c "ls -S {} | head -3" \; 
+   798	find Data -maxdepth 1 -mindepth 1 -type d -exec echo \n{} \; -exec sh -c "ls -S {} | head -3" \; 
+   799	find Data -maxdepth 1 -mindepth 1 -type d -exec echo {} \; -exec sh -c "ls -S {} | head -3" \; 
+   800	cat -n .history > 2018-21-04.CL.txt
