@@ -19,8 +19,8 @@ Basics of programming in R
 -   6.6. Valores missing (NAN)
 -   6.7. Estructuras de datos (vectores, listas, dataframes)
 
-1. RStudio
-----------
+RStudio
+-------
 
 Cheatsheet de RStudio en:
 
@@ -647,13 +647,13 @@ Sys.Date()
 Sys.time()
 ```
 
-    ## [1] "2018-06-17 20:15:17 CEST"
+    ## [1] "2018-06-17 22:35:58 CEST"
 
 ``` r
 now()
 ```
 
-    ## [1] "2018-06-17 20:15:17 CEST"
+    ## [1] "2018-06-17 22:35:58 CEST"
 
 Convertir string a fecha
 
