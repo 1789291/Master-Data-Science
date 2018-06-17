@@ -4,23 +4,23 @@ Basics of programming in R
 Índice
 ------
 
-1.  RStudio
-2.  Pedir ayuda
-3.  Trabajando con paquetes
-4.  R como calculadora
-5.  Vectorización
-6.  Tipos de datos
+1.  [RStudio](#rstudio)
+2.  [Pedir ayuda](#pedir-ayuda)
+3.  [Trabajando con paquetes](#trabajando-con-paquetes)
+4.  [R como calculadora](#r-como-calculadora)
+5.  [Vectorización](#vectorización)
+6.  [Tipos de datos](#tipos-de-datos)
 
--   6.1. Numéricos
--   6.2. Strings
--   6.3. Expresiones regulares
--   6.4. Expresiones lógicas
--   6.5. Fechas
--   6.6. Valores missing (NAN)
--   6.7. Estructuras de datos (vectores, listas, dataframes)
+-   6.1. [Numéricos](#numéricos)
+-   6.2. [Strings](#strings)
+-   6.3. [Expresiones regulares](#expresiones-regulares)
+-   6.4. [Expresiones lógicas](#expresiones-lógicas)
+-   6.5. [Fechas](#fechas)
+-   6.6. [Valores missing](#valores-missing)
+-   6.7. [Estructuras de datos (vectores, listas,dataframes)](#estructuras-de-datos)
 
 RStudio
--------
+=======
 
 Cheatsheet de RStudio en:
 
@@ -78,8 +78,8 @@ Borrar todo lo que tengo en el WD:
 rm(list = ls())
 ```
 
-2. Pedir ayuda
---------------
+Pedir ayuda
+-----------
 
 ``` r
 help(mean)      # ayuda
@@ -87,8 +87,8 @@ help(mean)      # ayuda
 example(mean)   # me hace un ejemplo 
 ```
 
-3. Trabajando con paquetes
---------------------------
+Trabajando con paquetes
+-----------------------
 
 El sitio más común para obtener paquetes es CRAN, aunque puedo obtenerlos de cualquier sitio.
 
@@ -145,8 +145,8 @@ Lista de paquetes útiles en R:
 
 <https://support.rstudio.com/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages>
 
-4. R como calculadora
----------------------
+R como calculadora
+------------------
 
 ``` r
 8 + 9 / 5 ^ 2
@@ -213,8 +213,8 @@ cos(x)      # cosine and other trigonometric functions
 
     ## [1] -0.839
 
-5. Vectorización
-----------------
+Vectorización
+-------------
 
 ``` r
 x <- c(1,3,4)  # Creo un vector con c (concatenar)
@@ -246,10 +246,10 @@ x > y
 
     ## [1] FALSE FALSE  TRUE
 
-6. Tipos de datos
------------------
+Tipos de datos
+--------------
 
-### 6.1. Numéricos
+### Numéricos
 
 ``` r
 dbl_var <- c(1, 2.5)
@@ -381,7 +381,7 @@ print(round(x, digits = 1))
 
     ## [1] 1.0 1.4 1.7 2.0 2.4 2.8 3.1
 
-### 6.2. Strings
+### Strings
 
 ``` r
 a <- "learning to create"    
@@ -538,7 +538,7 @@ sort(set_2, decreasing = TRUE)
 
     ## [1] "sierra"    "lagunitas" "harpoon"   "founders"  "bells"
 
-### 6.3. Expresiones regulares
+### Expresiones regulares
 
 ``` r
 sub(pattern = "\\$", "\\!", "I love R$")  
@@ -558,7 +558,7 @@ gsub(pattern = "\\\\", " ", "I\\need\\space")
 
     ## [1] "I need space"
 
-### 6.4. Expresiones lógicas
+### Expresiones lógicas
 
 ``` r
 x <- 5
@@ -614,7 +614,7 @@ sum(x > 13)  # Me devuelve cuántos elementos son >13, no la suma de ellos
 
     ## [1] 2
 
-### 6.5. Fechas
+### Fechas
 
 Librería `lubridate`
 
@@ -647,13 +647,13 @@ Sys.Date()
 Sys.time()
 ```
 
-    ## [1] "2018-06-17 22:35:58 CEST"
+    ## [1] "2018-06-17 23:01:00 CEST"
 
 ``` r
 now()
 ```
 
-    ## [1] "2018-06-17 22:35:58 CEST"
+    ## [1] "2018-06-17 23:01:00 CEST"
 
 Convertir string a fecha
 
@@ -821,7 +821,7 @@ as.numeric(meses_hasta_final)
 
     ## [1] 6.57
 
-### 6.6. Valores missing (NAN)
+### Valores missing
 
 ``` r
 x <- c(1:4, NA, 6:7, NA)
@@ -861,7 +861,7 @@ x
 
     ## [1] 1.00 2.00 3.00 4.00 3.83 6.00 7.00 3.83
 
-### 6.7. Estructuras de datos
+### Estructuras de datos
 
 ``` r
 vector <- 1:10  #Vector
@@ -962,7 +962,7 @@ attributes(df)$names
 
     ## [1] "item1" "item2"
 
-#### 6.7.1. Vectores
+#### Vectores
 
 Crear un vector
 
@@ -1056,7 +1056,7 @@ vector  # Transforma el número en texto
 
     ## [1] "20"   "Hola"
 
-#### 6.7.2. Listas
+#### Listas
 
 En los vectores todos los elemntos son del mismo tipo. En las listas no. Las listas nos sirven para combinar elementos de distinto tipo.
 
@@ -1103,7 +1103,7 @@ l1$item6  # Lo mismo
 
     ## [1] 1 2 3
 
-#### 6.7.3. Dataframes
+#### Dataframes
 
 Crear dataframe
 
