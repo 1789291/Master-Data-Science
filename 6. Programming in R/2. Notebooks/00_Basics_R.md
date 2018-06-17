@@ -20,7 +20,7 @@ Basics of programming in R
 -   6.7. [Estructuras de datos (vectores, listas,dataframes)](#estructuras-de-datos)
 
 RStudio
-=======
+-------
 
 Cheatsheet de RStudio en:
 
@@ -647,13 +647,13 @@ Sys.Date()
 Sys.time()
 ```
 
-    ## [1] "2018-06-17 23:01:00 CEST"
+    ## [1] "2018-06-17 23:02:47 CEST"
 
 ``` r
 now()
 ```
 
-    ## [1] "2018-06-17 23:01:00 CEST"
+    ## [1] "2018-06-17 23:02:47 CEST"
 
 Convertir string a fecha
 
