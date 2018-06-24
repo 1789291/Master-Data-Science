@@ -1,0 +1,108 @@
+---
+title: "SQL in R"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Index
+
+1. [SQL with R](#sql-with-r)
+2. [Working with databases](#working-with-databases)
+
+# SQL with R
+
+Para escribir queries de SQL en R, utilizamos `sqldf`. Ver paquete en: https://github.com/ggrothendieck/sqldf
+
+Cargamos un df:
+
+```{r}
+flights <- data.table::fread('data/flights/2008.csv')
+```
+
+
+```{r}
+library(sqldf)
+
+carrier_delays <- sqldf("SELECT UniqueCarrier, COUNT(ArrDelay) AS ArrivalDelays FROM flights WHERE ArrDelay > 0 AND Dest = 'JFK' AND Year = 2008  GROUP BY UniqueCarrier ORDER BY 2 DESC");
+
+```
+
+```{r}
+head(carrier_delays)
+```
+
+
+# Working with databases
+
+Podemos gestionar datos en una base de datos relacional con DBI:
+
+```{r}
+library(DBI)
+
+con <- dbConnect(RSQLite::SQLite(), path = ":memory:")  # Le estamos diciento que cree la BD relacional en memoria
+
+```
+
+
+```{r}
+# Crea la conexión en un archivo temporal
+tmp <- tempfile()
+con <- dbConnect(RSQLite::SQLite(), tmp)
+
+```
+
+```{r}
+dbWriteTable(con, "flights", flights)  # Escribimos una tabla: cogemos una tabla y le decimos cómo guardarla en la BD
+dbListTables(con)  # Lista de las tablas que tengo
+dbListFields(con, "flights")  # Lista los campos
+
+
+```
+
+```{r}
+# Hacemos una query
+query <- dbSendQuery(con, "SELECT * FROM flights WHERE Dest = 'JFK' LIMIT 10")
+
+# Almacenamos el resultado de la query en jfk
+jfk <- dbFetch(query)
+
+head(jfk)
+
+```
+
+Para finalizar la conexión:
+
+```{r}
+dbClearResult(query)  
+dbDisconnect(con)
+unlink(tmp)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
