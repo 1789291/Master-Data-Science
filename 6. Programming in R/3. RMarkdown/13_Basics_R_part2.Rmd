@@ -1,0 +1,107 @@
+---
+title: "Basics of programming in R: part 2"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Index
+
+1. [Estructuras de control](#estructuras-de-control)
+2. [Condiciones](#condiciones)
+3. [Bucles for](#bucles-for)
+4. [Creación de funciones](#creación-de-funciones)
+5. [lapply y sapply](#lapply-y-sapply)
+
+# Estructuras de control
+
+* If-else:
+
+```{r}
+
+numeros <- 1:15
+
+numero_aleatorio <- sample(numeros, 1)
+
+if (numero_aleatorio >= 10) {
+  print( paste(numero_aleatorio, "es mayor o igual que 10") )
+} else if (numero_aleatorio > 5) {
+  print( paste(numero_aleatorio, "es mayor o igual que 5") )
+} else {
+  print( paste(numero_aleatorio, "es menor que 5") )
+}
+
+```
+
+Otra manera: función `if_else` (como la del excel):
+
+```{r}
+ifelse(numero_aleatorio <= 10,
+       print(paste(numero_aleatorio, "es menor o igual que 10")),
+       print(paste(numero_aleatorio, "es mayor que 10")))
+
+# Menos clara
+```
+
+# Condiciones
+
+`and` y `or`:
+
+```{r}
+numero_aleatorio > 5 & numero_aleatorio < 10
+
+numero_aleatorio > 5 | numero_aleatorio < 10
+
+```
+
+# Bucles for
+
+
+```{r}
+calendario <- seq(2010, 2018 , by = 1)
+
+for (ano in calendario){
+  print(paste("El año es", ano))
+}
+
+```
+
+# Creación de funciones
+
+```{r}
+ano_actual <- as.numeric(format(Sys.Date(),'%Y'))  # obtenemos el año actual
+
+
+busca_ano_actual <- function(ano) {
+  if(ano == ano_actual) {  
+    resultado <- paste( ano, "es el año actual")
+  } else {
+    resultado <- paste( ano, "no es el año actual")
+  }
+  return(resultado)
+}
+
+busca_ano_actual(2015)
+```
+
+Si quisiéramos hacer un return de varios valores -> con una lista.
+
+# lapply y sapply
+
+Es una manera de hacer bucles for pero más limpia, con estructuras de R. Sobre algo iterable (por ejemplo, una lista) aplico una función y devuelvo el resultado.
+
+`lapply`
+```{r}
+lapply(calendario, function(ano) return (ano *2))  # Esto es como una función lambda
+
+```
+
+`sapply` es la misma idea pero me devuelve un array en vez de una lista.
+
+```{r}
+sapply(calendario, function(ano) return (ano *2))  # Esto es como una función lambda
+
+```
+
