@@ -1,0 +1,205 @@
+---
+title: "Big Data con BigQuery"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Index
+
+1. [Introducción](#introducción)
+2. [BigQuery](#bigquery)
+3. [BigQuery desde R](#bigquery-desde-r)
+
+
+# Introducción
+
+BigQuery es un servicio de Google mediante el cual podemos realizar queries sobre datos enormes que no cabrían en memoria. Estas queries las hace muy rápido.
+
+Google te cobra por el almacenamiento de datasets grandes. En este notebook nos vamos a conectar a unos datos que tiene subidos el profesor y realizaremos queries sobre ellos, en la interfaz de BigQuery en el navegador y en R.
+
+Google también permite crearte tu propio clúster de big data (por ejemplo en spark). Pero para simplemente hacer consultas a una base de datos BigQuery es lo mejor.
+
+# BigQuery
+
+Por tanto, con BigQuery podemos subir un archivo enorme (o aprovechar uno ya subido), hacer consultas en SQL y descargarnos el resultado.
+
+Para acceder a BigQuery hay que crear un proyecto en Google Cloud Platform. Después, en el menú lateral entramos en BigQuery. En Compose Query podemos realizar una nueva query.
+
+Para acceder al dataset del profesor (vuelos), entramos en:
+
+https://bigquery.cloud.google.com/table/datascience-open-data:flights.flights
+
+Probando una query, vemos que sobre un dataset de 16gb tarda **muy** poco. Probamos:
+
+```{r, eval = FALSE}
+SELECT * FROM `datascience-open-data.flights.flights` LIMIT 1000
+
+```
+
+Cuidado, para poder ejecutar las queries, en Options hay que quitar lo de SQL Legacy.
+
+# BigQuery desde R
+
+Podemos hacer queries en BigQuery directamente desde R:
+
+```{r}
+library(bigrquery)
+library(ggplot2)
+library(sqldf)
+library(dplyr)
+```
+
+
+```{r}
+# Al conectarnos con esto nos pide Seleccionar Yes o No para un tema del token. Le damos a Yes.
+
+# Nos estamos conectando a la base de datos flights en datascience-open-data
+con <- DBI::dbConnect(bigquery(),
+                      project = "datascience-open-data",
+                      dataset = "flights",
+                      billing = "master-data-science-mfz")
+
+```
+
+```{r}
+# Ahora miro qué tablas tengo
+DBI::dbListTables(con)
+
+```
+
+```{r}
+# Creamos un objeto tbl con esa conexión a flights
+
+flights_db <- tbl(con, "flights")
+```
+
+Ahora yo puedo hacer ya la query desde aquí, no desde el navegador con BigQuery
+
+```{r}
+sql <- "SELECT
+  COUNT(DISTINCT Year) AS years,
+COUNT(DISTINCT UniqueCarrier) AS carriers,
+COUNT(DISTINCT Dest) AS airports
+FROM (
+SELECT
+Year,
+UniqueCarrier,
+Dest
+FROM
+`datascience-open-data.flights.flights`
+GROUP BY
+1,
+2,
+3 )"
+
+
+query_exec(sql, project = "master-data-science-mfz", use_legacy_sql = F)
+
+# En mi proyecto, me haces esa consulta (que es sobre los datos de otro proyecto)
+
+```
+
+También podemos hacer consultas con dplyr
+```{r}
+flights_db %>% head 
+
+```
+
+```{r}
+cancellations <- flights_db %>% 
+  group_by(Year) %>% 
+  summarise(n_flights = n(), 
+            n_canc = sum(Cancelled)) %>% 
+  collect()  # Esto es porque las querys son lazy, así que con collect nos lo devuelve.
+
+```
+
+```{r}
+# Ahora que el dataset es más pequeño ya hacemos otra query en locsl
+
+cancellations_by_year <- cancellations %>% 
+  mutate(ratio = n_canc / n_flights) %>% 
+  arrange(desc(Year)) 
+
+```
+
+
+```{r}
+ggplot(cancellations_by_year, aes(x=Year, y=ratio, group=1)) +
+  geom_line() + 
+  theme_light()
+
+```
+
+```{r}
+
+cancellations <- flights_db %>% 
+  group_by(Year,Dest) %>% 
+  summarise(n_flights = n(), 
+            n_canc = sum(Cancelled)) %>% 
+  collect() 
+
+cancellations_1 <- cancellations %>% 
+  mutate(ratio = n_canc / n_flights) %>% 
+  arrange(n_flights)
+
+```
+
+```{r}
+ggplot(cancellations_1, aes(x=Year, y=ratio, group=Dest, color=Dest)) +
+  geom_line(show.legend=F, aes(color = Dest), size=0.6, alpha=.5) + 
+  scale_x_continuous()+
+  theme_light()
+
+```
+
+```{r}
+# What's happening?
+cancellations_1 %>% summary()
+
+hist(cancellations_1$n_flights, breaks = 100)
+hist(cancellations_1$n_canc, breaks = 100)
+
+cancellations_2 <- cancellations %>% 
+  filter(abs(n_flights - mean(n_flights)) > 2*sd(n_flights) ) %>% 
+  mutate(ratio = n_canc / n_flights, 
+         top = if_else(ratio > .04, "Y", "N") )%>% 
+  arrange(n_flights)
+
+ggplot(cancellations_2, aes(x=Year, y=ratio, group=Dest, color=top)) +
+  geom_line(show.legend=T, aes(color = top), size=.6, alpha=.9) + 
+  scale_x_continuous()+
+  scale_colour_brewer(palette = "Set1", direction = -1) +
+  theme_light()
+
+```
+
+Para cerrar la conexión:
+
+```{r}
+DBI::dbDisconnect(con)  # Cerramos la conexión
+
+```
+
+
+* Para subir datos a bigquery, hay varias maneras: directamente, desde google drive, etc... 
+* También tenemos que determinar el schema -> automático o manual.
+*Destination Table, puedes tener Table type / External Type: esto es que no tengo mis datos almacenados como tabla de bigquery, sino que está apuntando a mi csv ycada vez que hago una consulta lo lee y la hace. Está bien para no tener que pagar el almacenamiento de la tabla en bigquery.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
