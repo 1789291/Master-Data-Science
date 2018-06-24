@@ -1,0 +1,559 @@
+---
+title: "Managing datasets with dplyr"
+output: github_document
+---
+
+## Índice
+
+1. [Select](#select)
+2. [Mutate](#mutate)
+3. [Filter](#filter)
+4. [Arrange](#arrange)
+5. [Summarise](#summarise)
+6. [Group By](#group-by)
+7. [Top_n](#top_n)
+8. [Mutate_If](#mutate_if)
+9. [Mutate_At](#mutate_at)
+10. [Trabajando con outliers](#trabajando-con-outliers)
+11. [Valores nulos](#valores-nulos)
+12. [Separate y Unite](#separate-y-unite)
+13. [Spread y Gather](#spread-y-gather)
+14. [Joins](#joins)
+15. [Fechas](#fechas)
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Importamos una tabla
+```{r}
+flights <- readr::read_csv('data/flights/2008.csv', progress = FALSE)
+```
+
+Nombres de las columnas
+```{r}
+names(flights)
+```
+Cabecera
+```{r}
+head(flights)
+```
+Dimensión
+```{r}
+dim(flights)
+```
+Descripción
+```{r, eval = FALSE}
+summary(flights)
+```
+```{r}
+summary(flights$CarrierDelay)
+```
+
+Cargamos librerías para operar con tablas
+```{r}
+library(dplyr)
+library(tidyverse)
+
+```
+
+Extracción de una muestra:
+
+```{r}
+sample_n(flights, 10)
+```
+
+
+# Select
+
+Selecciona columnas de un dataframe
+
+```{r}
+a <- select(flights, ActualElapsedTime, ArrDelay, DepDelay)
+head(a)
+```
+
+Funciones de ayuda para seleccionar:
+
+* `starts_with(“X”)`: every name that starts with “X”
+* `ends_with(“X”)`: every name that ends with “X”
+* `contains(“X”)`: every name that contains “X”
+* `matches(“X”)`: every name that matches “X”, where “X” can be a regular expression
+* `num_range(“x”, 1:5)`: the variables named x01, x02, x03, x04 and x05
+* `one_of(x)`: every name that appears in x, which should be a character vector
+
+
+```{r, eval = FALSE}
+select(flights, Origin:Cancelled)  # Cógeme todas las columnas entre esas dos
+select(flights, -(DepTime:AirTime))  # Cógeme todas las columnas menos las que están entre esas dos
+select(flights, UniqueCarrier, FlightNum, contains("Tail"), ends_with("Delay"))  # Ambas condiciones (or)
+
+
+```
+
+# Mutate
+
+Crea campos computados
+
+```{r, eval = FALSE}
+foo <- mutate(flights, ActualGroundTime = ActualElapsedTime - AirTime)  # Creamos la columna ActualGroundTime
+
+```
+
+```{r, eval = FALSE}
+# Podemos combinar varias operaciones a la vez (crear varios campos a la vez)
+
+foo <- mutate(flights, 
+              loss = ArrDelay - DepDelay, 
+              loss_percent = (loss/DepDelay) * 100 )  # Incluso aquí puedo usar la variable que he creado justo antes
+
+```
+
+Con la función recode podemos recodificar un campo:
+
+```{r, eval = FALSE}
+flights %>% 
+  mutate(CancellationCode = recode(CancellationCode, "A"="Carrier", "B"="Weather", "C"="National Air System", 
+                                   .missing="Not available", 
+                                   .default="Others" ))
+```
+
+
+# Filter
+
+* `x < y`, TRUE if x is less than y
+* `x <= y`, TRUE if x is less than or equal to y
+* `x == y`, TRUE if x equals y
+* `x != `y, TRUE if x does not equal y
+* `x >= y`, TRUE if x is greater than or equal to y
+* `x > y`, TRUE if x is greater than y
+* `x %in% c(a, b, c)`, TRUE if x is in the vector c(a, b, c)
+
+
+```{r, eval = FALSE}
+filter(flights, Distance > 3000)
+filter(flights, UniqueCarrier %in% c('AA', 'UA'))
+filter(flights, TaxiIn + TaxiOut > AirTime)  # No hace falta hacer el mutate
+filter(flights, DepDelay > 0 & ArrDelay < 0)
+filter(flights, Cancelled == 1, DepDelay > 0)  # La coma es equivalente al &
+
+# Para negaciones -> al principio
+
+filter(flights, !UniqueCarrier %in% c('AA', 'UA'))
+
+
+```
+
+# Arrange
+
+Ordena. Es un ORDER BY.
+
+
+```{r, eval = FALSE}
+( cancelled <- select(flights, UniqueCarrier, Dest, Cancelled, CancellationCode, DepDelay, ArrDelay) )
+
+( cancelled <- filter(cancelled, Cancelled == 1, !is.na(DepDelay)) )  # Cancelados y que no tengan nulos en DepDelay
+
+```
+
+```{r, eval = FALSE}
+arrange(cancelled, DepDelay)  # Ordena cancelled por DepDelay
+
+arrange(cancelled, CancellationCode)
+
+arrange(cancelled, UniqueCarrier, DepDelay)
+
+arrange(cancelled, UniqueCarrier, desc(DepDelay))  # Descending
+
+arrange(flights, DepDelay + ArrDelay)  # Podemos hacer operaciones dentro del arrange (como en el filter)
+
+arrange(filter(flights, Dest == 'JFK'), desc(AirTime))
+
+```
+
+
+# Summarise
+
+No es lo mismo que un GROUP BY. Aplicar un summarise es que me va a dar una sola fila con la media, mediana, etc...
+Esto será útil cuando lo juntemos con un groupby para que me obtenga esas magnitudes para grupos. Es la manera de agrupar en `dplyr`.
+
+* `min(x)` – minimum value of vector x.
+* `max(x)` – maximum value of vector x.
+* `mean(x)` – mean value of vector x.
+* `median(x)` – median value of vector x.
+* `quantile(x, p)` – pth quantile of vector x.
+* `sd(x)` – standard deviation of vector x.
+* `var(x)` – variance of vector x.
+* `IQR(x)` – Inter Quartile Range (IQR) of vector x.
+
+* `first(x)` - The first element of vector x.
+* `last(x)` - The last element of vector x.
+* `nth(x, n)` - The nth element of vector x.
+* `n()` - The number of rows in the data.frame or group of observations that summarise() describes.
+* `n_distinct(x)` - The number of unique values in vector x.
+
+
+```{r}
+# Print out a summary with variables min_dist and max_dist
+a <- summarize(flights, min_dist = min(Distance), max_dist = max(Distance))
+head(a)
+```
+
+```{r}
+# Remove rows that have NA ArrDelay: temp1
+na_array_delay <- filter(flights, !is.na(ArrDelay))
+
+# Generate summary about ArrDelay column of temp1
+
+df <- summarise(na_array_delay, 
+                earliest = min(ArrDelay), 
+                average = mean(ArrDelay), 
+                latest = max(ArrDelay), 
+                sd = sd(ArrDelay))
+
+head(df)
+```
+
+```{r}
+# Si hay NANs el summarize me va a dar error. Para eso, na.rm = True
+
+df <- summarise(flights, 
+                earliest = min(ArrDelay), 
+                average = mean(ArrDelay), 
+                latest = max(ArrDelay), 
+                sd = sd(ArrDelay),
+                na.rm = TRUE)
+```
+
+```{r}
+hist(na_array_delay$ArrDelay)
+
+```
+
+
+# Group By
+
+Con summarise sumarizo toda la tabla y obtengo medidas (mínimo, máximo, etc...) de las variables que yo quiero. Combinándolo con el group_by, calcularé estas medidas pero de los grupos que yo defina.
+
+```{r}
+group_by(flights, UniqueCarrier)
+
+# El group_by es lazy, al igual que en python. Lo combinaré con el summarise.
+```
+
+Para combinar estas operaciones: **piping**:
+
+Con el símbolo `%>%` (Ctrl + Shift + M) encadenamos operaciones:
+
+```{r, eval = FALSE}
+summarize(filter(mutate(flights, diff = TaxiOut - TaxiIn),!is.na(diff)), avg = mean(diff))
+
+# vs
+
+flights %>%
+  mutate(diff=(TaxiOut-TaxiIn)) %>%
+  filter(!is.na(diff)) %>%
+  summarise(avg=mean(diff))
+
+
+```
+
+Por tanto, para hacer group by:
+
+```{r}
+flights %>% 
+  group_by(UniqueCarrier) %>% 
+  summarise(n_flights = n(), 
+            n_canc = sum(Cancelled), 
+            p_canc = 100*n_canc/n_flights, 
+            avg_delay = mean(ArrDelay, na.rm = TRUE)) %>% 
+  arrange(avg_delay)
+
+# Obtengo las variables del summarise para cada grupo.
+
+```
+
+
+```{r}
+# Por ejemplo, para sacar un ranking:
+
+rank(c(21, 22, 24, 23))  # Te saca un ranking
+
+flights %>% 
+  filter(!is.na(ArrDelay)) %>%  # Quita retrasos
+  group_by(UniqueCarrier) %>%  # Agrupa por compañia. EL groupby es lazy como en python
+  summarise(p_delay = sum(ArrDelay >0)/n()) %>%  # Este n() es cada n de cada compañía
+  mutate(rank = rank(p_delay)) %>% 
+  arrange(rank) 
+
+```
+
+# Top_n
+
+```{r}
+flights %>% 
+  group_by(UniqueCarrier) %>% 
+  top_n(2, ArrDelay) %>%  # Me coge el top 2 de ArrDelay
+  select(UniqueCarrier,Dest, ArrDelay) %>% 
+  arrange(desc(UniqueCarrier))
+
+```
+
+# Mutate_if
+
+Me realiza una transformación con una condición:
+```{r, eval = FALSE}
+flights %>% 
+  mutate_if(is.character, str_to_lower)
+
+# A las columnas que son de tipo caracter, ponlas en minúsculas
+```
+
+# Mutate_at
+
+Me permite hacer una transformación sobre las columnas que yo quiera (eligiéndolas como en un select):
+
+```{r}
+foo <- flights %>% 
+  head %>% 
+  select(contains("Delay")) %>%   # Se queda con las columnas que contienen Delay
+  mutate_at(vars(ends_with("Delay")), funs(./2))   
+# le digo que sobre las variables que terminen en delay y le aplicas funs (divídelas entre dos)
+# El . es un comodín porque funs tiene como argumento el objeto al que le aplico la función, pero como ya se lo estoy diciendo con el pipe, pongo un '.'
+
+```
+
+# Trabajando con outliers
+
+```{r}
+# Gestionaremos los outliers de la variable ActualElapsedTime.
+summary(flights$ActualElapsedTime)
+
+```
+
+```{r}
+hist(flights$ActualElapsedTime)  # Vemos en el histograma que hay outliers
+
+```
+
+```{r}
+boxplot(flights$ActualElapsedTime,horizontal = TRUE)
+
+```
+
+```{r}
+# Esto nos devuelve una lista de outliers en base al criterio del boxplot
+outliers <- boxplot.stats(flights$ActualElapsedTime)$out
+length(outliers)
+
+
+```
+
+```{r}
+no_outliers <- flights %>% 
+  filter(!ActualElapsedTime %in% outliers) 
+
+```
+
+```{r}
+boxplot(no_outliers$ActualElapsedTime,horizontal = TRUE)
+
+```
+
+```{r}
+hist(no_outliers$ActualElapsedTime)
+
+```
+
+# Valores nulos
+
+Eliminar todas las filas con algún NA
+
+```{r, eval = FALSE}
+# Manera 1
+
+flights %>% na.omit
+
+# Manera 2
+
+flights %>% filter(complete.cases(.)) 
+
+# Manera 3
+
+library(tidyr) # para drop_na()
+flights %>% drop_na()
+
+
+
+```
+Eliminar todos los NA de una variable o un conjunto de variables
+
+```{r, eval = FALSE}
+flights %>% 
+  drop_na(ends_with("Delay"))
+
+```
+
+Sustitución de NAs:
+
+```{r, eval = FALSE}
+# Sustituir por cero
+flights %>% 
+  mutate(DepTime = coalesce(DepTime, 0L))  # Esto me pone DepTime a 0 en los missings (lo del L es para que sea integer)
+
+
+# Sustituir por el valor de otra columna en ese mismo registro
+flights %>% 
+  mutate(DepTime = coalesce(DepTime, CRSDepTime))  #  Ponle el valor de otra columna
+
+
+# Sustituir un valor raro por un NA
+foo <- flights %>% 
+  mutate(CancellationCode = na_if(CancellationCode, "A"))  # Sustituyo 'A' por NA
+
+```
+
+# Separate y Unite
+
+Separate: Separa una columna en varias:
+
+```{r}
+flights %>% select(TailNum) %>% 
+  separate(TailNum, into = c('T1', 'T2'), sep = "2")
+
+# Separa TailNum en dos columnas T1 y T2 con el separador '2'
+```
+
+
+Unite: Une dos o más columnas
+
+```{r, eval = FALSE}
+flights %>% 
+  head(20) %>% 
+  unite("code", UniqueCarrier, TailNum, sep = "-")  # Esto es igual que un paste, solo que el paste he de meterlo en un mutate. El equivalente de paste en tuberías es el unite
+
+```
+
+# Spread y gather
+
+Spread: me coge un conjunto de datos en formato largo y me lo pone en formato ancho.
+
+Gather: lo contrario
+
+```{r, eval = FALSE}
+flights %>% 
+  group_by(Origin, Dest) %>% 
+  summarise(n = n()) %>% 
+  arrange(-n) %>%   # Ordena descendentemente
+  spread(Origin, n) %>%  # Me crea una columna con cada origen
+  gather("Origin", "n", 2:ncol(.)) %>%  # Créame una columna Origin y otra n con las columnas que hay desde la posición 2 hasta el final
+  arrange(-n) 
+```
+
+# Joins
+
+```{r}
+# Importamos dos tablas:
+
+airlines <- readr::read_csv('data/airlines.csv', progress = FALSE)
+airports <- readr::read_csv('data/airports.csv', progress = FALSE)
+
+
+```
+
+Chequear si hay duplicados en un campo:
+
+```{r}
+airports %>% 
+  count(iata) %>% 
+  filter(n > 1)
+# Nos devuelve 0 -> OK
+
+```
+
+```{r}
+flights2 <- flights %>% 
+  select(Origin, Dest, TailNum, UniqueCarrier, DepDelay)
+
+# Top delayed flight by airline
+flights2 %>% 
+  group_by(UniqueCarrier) %>%
+  top_n(1, DepDelay) %>% 
+  left_join(airlines, by = c("UniqueCarrier" = "Code"))
+
+```
+
+* inner_join(x, y)  SELECT * FROM x INNER JOIN y USING (z)
+* left_join(x, y) SELECT * FROM x LEFT OUTER JOIN y USING (z)
+* right_join(x, y, by = "z") SELECT * FROM x RIGHT OUTER JOIN y USING (z)
+* full_join(x, y, by = "z") SELECT * FROM x FULL OUTER JOIN y USING (z)
+
+* semi_join(x, y)
+* anti_join(x, y)
+
+https://www.rdocumentation.org/packages/dplyr/versions/0.7.5/topics/join
+
+
+# Fechas
+
+Convertir un string a fecha:
+
+```{r}
+as.POSIXct("2013-09-06", format="%Y-%m-%d")
+as.POSIXct("2013-09-06 12:30", format="%Y-%m-%d %H:%M")
+typeof(as.POSIXct("2013-09-06", format="%Y-%m-%d"))
+# En format le indico el formato en el que está la fecha de entrada
+```
+
+Convertir una fecha a un string:
+
+```{r}
+date <- as.POSIXct("2013-09-06", format="%Y-%m-%d")
+
+date_string <- as.character(date)
+
+typeof(date_string)
+```
+
+
+Para ayuda con los formatos de fechas y horas ver:
+
+https://docs.python.org/2/library/datetime.html
+
+Para más operaciones con fechas -> librería `lubridate`:
+
+```{r}
+library(lubridate)
+today()
+now()
+
+```
+```{r}
+(datetime1 <- ymd_hms(now(), tz = "UTC"))
+(datetime2 <- ymd_hms(now(), tz = 'Europe/Madrid'))
+datetime1
+datetime2
+```
+
+```{r}
+datetime <- ymd_hms(now(), tz = "UTC")
+
+year(datetime)
+month(datetime)
+mday(datetime)
+
+```
+
+```{r}
+ymd_hm("2013-09-06 12:03")
+
+```
+
+
+
+
+
+
+
