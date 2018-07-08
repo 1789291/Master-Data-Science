@@ -1,0 +1,115 @@
+---
+title: "Advanced Importing and Exporting"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Index
+
+1. [Importar datos](#importar-datos)
+2. [Exportar datos](#exportar-datos)
+
+Este notebook contiene nociones avanzadas de importado y exportado de datos.
+
+Cargamos librerías:
+
+```{r}
+require(readr)  # for read_csv()
+require(dplyr)  # for mutate()
+require(tidyr)  # for unnest()
+require(purrr)  # for map(), reduce()
+require(data.table) # for fread()
+
+```
+
+# Importar datos
+
+Para leer varios ficheros de forma automatizada y combinarlos (por ejemplo, cuando tenemos varios ficheros de la misma estructura pero para distinto año, mes, etc...):
+
+```{r}
+data_path <- file.path("data", "flights")  # creamos el path
+files <- dir(data_path, pattern = "*.csv")  # creamos un string con todo lo que termine en csv
+
+```
+
+Leemos todos los archivos y los combinamos en una tabla:
+```{r}
+flights <- files %>%
+  # read in all the files, appending the path before the filename
+  map(~ read_csv(file.path(data_path, .))) %>%  
+  reduce(rbind)
+
+```
+
+Otra manera:
+
+```{r, eval=FALSE}
+flights <- files %>%
+  map(function(x) read_csv(file.path(data_path, x))) %>%  
+  reduce(rbind)
+flights
+
+```
+
+Una manera más rápida de hacerlo es con `data.table`. Podemos crear una lista con los dos dataframes:
+
+```{r}
+system.time( flights <- data_frame(filename = files) %>% # create a data frame
+               # holding the file names
+               mutate(file_contents = map(filename,          # read files into
+                                          ~ data.table::fread(file.path(data_path, .), showProgress=T, nThread=4)) # a new data column
+               )  )
+
+```
+
+```{r}
+flights
+```
+
+
+Y después, con `unnest`:
+
+```{r}
+flights <- unnest(flights)
+```
+
+```{r}
+head(flights)
+```
+
+```{r}
+print(object.size(get('flights')), units='auto')
+```
+
+
+# Exportar datos
+
+Creamos una carpeta destino:
+
+```{r, eval = FALSE}
+dir.create('exports')
+
+```
+
+Exportamos a csv:
+```{r, eval = FALSE}
+
+flights %>% 
+  sample_n(1000) %>% 
+  write_csv(., file.path("exports", "flights.csv"))
+
+```
+
+Podemos exportar un archivo con cada mes:
+
+```{r, eval = FALSE}
+flights %>% 
+  sample_n(1000) %>% 
+  group_by(Year, Month) %>%
+  do(write_csv(., file.path("exports", paste0(unique(.$Year),"_",unique(.$Month), "_flights.csv"))))
+
+```
+
