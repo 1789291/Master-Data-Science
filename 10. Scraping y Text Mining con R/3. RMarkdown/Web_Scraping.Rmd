@@ -1,0 +1,160 @@
+---
+title: "Web Scraping"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Este notebook contiene los ejercicios realizados en clase. Para la explicación teórica ver apuntes pdf y html.
+
+En primer lugar, leemos el contenido HTML de la página
+
+```{r, message=FALSE}
+require(rvest)
+require(dplyr)
+```
+
+```{r}
+amanece <- read_html("http://www.imdb.com/title/tt0094641/")
+```
+
+Extraemos el título:
+```{r}
+amanece %>% html_nodes('title')
+```
+
+Pero yo sólo quiero el texto:
+
+```{r}
+amanece %>% html_nodes('title') %>% html_text()
+
+```
+
+Ahora, si queremos extraer un párrafo:
+
+```{r}
+# Identifico lo que quiero con html_nodes (me da todos los párrafos)
+# Elijo el párrafo que quiero
+# Y me quedo con el texto
+
+amanece %>% html_nodes('p') %>% .[19] %>% html_text(trim=TRUE) # Esto me quita los \n
+
+```
+
+Extraemos la tabla del Cast:
+
+```{r}
+amanece %>% html_nodes('table') %>% .[[1]] %>% html_table(header = TRUE) %>% .[[2]]
+```
+
+**Ejercicio**: Descargar el ultimo discurso del rey de España desde la siguiente dirección:
+
+http://www.casareal.es/ES/Actividades/Paginas/actividades_discursos_detalle.aspx?data=5738
+
+```{r}
+discurso <- read_html("http://www.casareal.es/ES/Actividades/Paginas/actividades_discursos_detalle.aspx?data=5000")
+
+discurso %>% html_nodes('p') %>% html_text() %>% paste(collapse = " ") %>% head
+
+```
+
+**Ejercicio**: Extraer los votos:
+```{r}
+p <- read_html("https://resultados.elpais.com/resultats/eleccions/2016/generals/congreso/")
+
+p %>% html_nodes('table') %>% .[[2]] %>% html_table(header=TRUE) %>% head
+
+```
+
+Volvemos con las películas:
+
+Tenemos que conocer los selectores CSS: https://www.w3schools.com/cssref/css_selectors.asp
+
+```{r}
+amanece %>% html_nodes("table a")
+```
+Y de esto, nos quedamos con los atributos que queremos: alt
+
+```{r}
+amanece %>% html_nodes("table a") %>% html_nodes('img') %>% html_attr('alt')
+
+```
+
+**Ejercicio**: extraer la lista de provincias de España de la Wikipedia
+
+```{r}
+provincias <- read_html("https://es.wikipedia.org/wiki/Provincia_de_Espa%C3%B1a")
+
+# Sabemos que hay tablas:
+
+provincias %>% html_nodes("table")
+
+# Me cojo la segunda
+
+tabla_provincias <- provincias %>% html_nodes("table") %>% .[[2]] %>% html_table(header=TRUE, fill = TRUE)
+
+head(tabla_provincias)
+```
+
+**Ejercicio**: Descargar las cotizaciones del IBEX 35 en tiempo real desde la siguiente página:
+
+```{r}
+ibex35 <- "http://www.bolsamadrid.es/esp/aspx/Mercados/Precios.aspx?indice=ESI100000000"
+
+ibex <- read_html(ibex35)
+
+ibex %>% html_nodes("table") %>% .[[5]] %>% html_table(header=TRUE, fill = TRUE) %>% head
+
+```
+
+Cuando tenemos muchas tablas y no sabemos cuál es la que queremos:
+
+```{r}
+# Podemos ver cuáles son las dimensiones de las tablas 
+
+ibex %>% html_nodes("table") %>%html_table(fill = TRUE) %>% lapply(dim)
+
+# O los nombres de las columnas
+
+# ibex %>% html_nodes("table") %>%html_table(fill = TRUE) %>% lapply(names)
+```
+
+### Navegación
+
+```{r}
+sesion <- html_session('http://www.imdb.com')
+```
+
+```{r}
+sesion %>% jump_to('boxoffice')
+```
+
+```{r}
+sesion %>% jump_to('boxoffice') %>% html_nodes('table')
+
+```
+
+Así me puedo ir moviendo por la página web desde R.
+
+### html_form (formularios)
+
+```{r}
+# Mostrar los formularios de una página web
+
+html_form(sesion)
+```
+
+Podemos desde aquí rellenar formularios (como si lo hiciéramos en el navegador):
+
+```{r}
+
+# Lo relleno
+busqueda <-html_form(sesion)[[1]] %>% set_values(`q` = "hunting", s="Titles") 
+# En el formulario puedo meter texto (q) y si es título, actor... (s)
+
+busqueda %>% submit_form(session=sesion) %>% html_nodes("table") %>% html_table() %>% .[[1]]
+
+```
+
